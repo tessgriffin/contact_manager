@@ -62,4 +62,61 @@ describe 'the company view', type: :feature do
       expect(page).to_not have_content(phone.number)
     end
   end
+
+  describe "email addresses" do 
+    before(:each) do 
+      company.email_addresses.create(address: "ned@stark.com")
+      company.email_addresses.create(address: "something@stuff.com")
+      visit company_path(company)
+    end
+
+    it "has a list of email addresses" do 
+      expect(page).to have_selector('li', text: 'ned@stark.com')
+    end
+
+    it "has an add email address link" do 
+      expect(page).to have_link("Add an email address", href: new_email_address_path(contact_id: company.id, contact_type: 'Company'))
+    end
+
+    it "adds a new email address" do 
+      page.click_link("Add an email address")
+      page.fill_in("Address", with: "thing@example.com")
+      page.click_button("Create Email address")
+      expect(current_path).to eq(company_path(company))
+      expect(page).to have_content("thing@example.com")
+    end
+
+    it "has a link to edit email addresses" do 
+      company.email_addresses.each do |email|
+        expect(page).to have_link("edit", href: edit_email_address_path(email))
+      end
+    end
+
+    it "edits a phone number" do 
+      email = company.email_addresses.first
+      old_address = email.address
+
+      first(:link, 'edit').click
+      page.fill_in('Address', with: 'newemail@example.com')
+      page.click_button('Update Email address')
+      expect(current_path).to eq(company_path(company))
+      expect(page).to have_content('newemail@example.com')
+      expect(page).to_not have_content(old_address)
+    end
+
+    it "has a link to delete an email address" do 
+      company.email_addresses.each do |email|
+        expect(page).to have_link("delete", href: email_address_path(email))
+      end
+    end
+
+    it "destroys an email address" do 
+      email = company.email_addresses.first
+
+      expect(page).to have_content(email.address)
+      first(:link, "delete").click
+      expect(current_path).to eq(company_path(company))
+      expect(page).to_not have_content(email.address)
+    end
+  end
 end

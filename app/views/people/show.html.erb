@@ -23,6 +23,6 @@
     <li><%= email.address %><%= link_to('edit', edit_email_address_path(email)) %><%= link_to('delete', email_address_path(email), :method => "delete" ) %></li>
   <% end %>
 </ul>
-<%= link_to 'Add an email address', new_email_address_path(person_id: @person.id) %>
+<%= link_to 'Add an email address', new_email_address_path(contact_id: @person.id, contact_type: 'Person') %>
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>
